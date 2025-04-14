@@ -52,7 +52,7 @@ namespace api_2.Controllers
                 if (!movieExist) return NotFound();
                 var cast = _repository.GetCastByMovie(movieId, id);
                 if (cast == null) return NotFound();
-                
+                CastDto nuevo = _mapper.Map<CastDto>(cast);
                 return Ok(_mapper.Map<CastDto>(cast));
             }
             catch (Exception ex)

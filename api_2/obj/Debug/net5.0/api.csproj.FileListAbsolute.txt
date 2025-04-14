@@ -62,3 +62,4 @@ c:\Users\matia\source\repos\Curso Net\api_2\bin\Debug\net5.0\runtimes\win-x86\na
 C:\Users\matia\source\repos\Curso Net\api_2\bin\Debug\net5.0\Microsoft.EntityFrameworkCore.Design.dll
 c:\Users\matia\source\repos\Curso Net\api_2\bin\Debug\net5.0\AutoMapper.dll
 c:\Users\matia\source\repos\Curso Net\api_2\bin\Debug\net5.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+c:\Users\matia\source\repos\Curso Net\api_2\obj\Debug\net5.0\api.sourcelink.json

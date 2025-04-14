@@ -131,3 +131,13 @@
 2025-04-07 13:51:41.9726|INFO|Microsoft.Hosting.Lifetime|Application started. Press Ctrl+C to shut down.
 2025-04-07 13:51:41.9726|INFO|Microsoft.Hosting.Lifetime|Hosting environment: Development
 2025-04-07 13:51:41.9726|INFO|Microsoft.Hosting.Lifetime|Content root path: C:\Users\matia\source\repos\Curso Net\api_2
+2025-04-07 16:45:53.1532|INFO|Microsoft.Hosting.Lifetime|Now listening on: https://localhost:5001
+2025-04-07 16:45:53.1723|INFO|Microsoft.Hosting.Lifetime|Now listening on: http://localhost:5000
+2025-04-07 16:45:53.1723|INFO|Microsoft.Hosting.Lifetime|Application started. Press Ctrl+C to shut down.
+2025-04-07 16:45:53.1751|INFO|Microsoft.Hosting.Lifetime|Hosting environment: Development
+2025-04-07 16:45:53.1751|INFO|Microsoft.Hosting.Lifetime|Content root path: C:\Users\matia\source\repos\Curso Net\api_2
+2025-04-07 16:47:42.4497|INFO|Microsoft.Hosting.Lifetime|Now listening on: https://localhost:5001
+2025-04-07 16:47:42.4685|INFO|Microsoft.Hosting.Lifetime|Now listening on: http://localhost:5000
+2025-04-07 16:47:42.4685|INFO|Microsoft.Hosting.Lifetime|Application started. Press Ctrl+C to shut down.
+2025-04-07 16:47:42.4715|INFO|Microsoft.Hosting.Lifetime|Hosting environment: Development
+2025-04-07 16:47:42.4715|INFO|Microsoft.Hosting.Lifetime|Content root path: C:\Users\matia\source\repos\Curso Net\api_2
