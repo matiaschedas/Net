@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Persistence;
 using SQLitePCL;
 using Domain;
+using FluentValidation;
 
 namespace Application.Channels
 {
@@ -21,29 +22,42 @@ namespace Application.Channels
             public Guid Id { get; set; }
             public string Name { get; set; }
             public string Description { get; set; }   
+            public ChannelType ChannelType {get; set;} = ChannelType.Channel;
         }
 
-    public class Handler : IRequestHandler<Command>
-    {
-        private DataContext _context;
-
-        public Handler(DataContext context)
+       
+        public class CommandValidator: AbstractValidator<Command>
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            public CommandValidator()
+            {
+                RuleFor(x => x.Name).NotEmpty();
+                RuleFor(x => x.Description).NotEmpty();
+            }
         }
-        public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
-        {
-           var channel = new Channel{
-                Id = request.Id,
-                Name = request.Name,
-                Description = request.Description
-           };
-           _context.Channels.Add(channel);
 
-           var success = await _context.SaveChangesAsync() > 0;
-           if(success) return Unit.Value;
-           throw new Exception("Ocurrio un problema al guardar los datos");
+        public class Handler : IRequestHandler<Command>
+        {
+            private DataContext _context;
+
+            public Handler(DataContext context)
+            {
+                _context = context ?? throw new ArgumentNullException(nameof(context));
+            }
+            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            {
+                
+                var channel = new Channel{
+                        Id = request.Id,
+                        Name = request.Name,
+                        Description = request.Description,
+                        ChannelType = request.ChannelType
+                };
+                _context.Channels.Add(channel);
+
+                var success = await _context.SaveChangesAsync() > 0;
+                if(success) return Unit.Value;
+                throw new Exception("Ocurrio un problema al guardar los datos");
+            }
         }
-    }
   }
 }

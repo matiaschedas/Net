@@ -1,4 +1,6 @@
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.deps.json
+C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.runtimeconfig.json
+C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.runtimeconfig.dev.json
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.dll
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.pdb
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Domain.dll
@@ -13,7 +15,5 @@ C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\Per
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\Persistence.dll
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\refint\Persistence.dll
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\Persistence.pdb
-C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\ref\Persistence.dll
-C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.runtimeconfig.json
-C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\bin\Debug\net5.0\Persistence.runtimeconfig.dev.json
 C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\Persistence.genruntimeconfig.cache
+C:\Users\matia\source\repos\Curso Net\NetChat_3\Persistence\obj\Debug\net5.0\ref\Persistence.dll

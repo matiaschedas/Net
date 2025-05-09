@@ -1,13 +1,28 @@
-import React from 'react'
-import { Dropdown, Grid, Header, Icon } from 'semantic-ui-react'
+import { observer } from 'mobx-react-lite'
+import React, { useContext, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Dropdown, Grid, Header, Icon, Message } from 'semantic-ui-react'
+import { RootStoreContext } from '../../Stores/rootStore'
 
 const UserPanel = () => {
+  const rootStore = useContext(RootStoreContext)
+  const { user, logout, IsLoggedIn} = rootStore.userStore
+  const channelStore = rootStore.channelStore
+  const { setNavigate } = channelStore
+  const navigate = useNavigate();
+  const triggerLogout = () => {
+    setNavigate(navigate)
+    logout(user?.id!)
+    navigate("/login");
+  }
+
+
   const dropdownOptions =() => 
     [{
     key: 'user',
     text: (
       <span>
-        Logged as: <strong>User</strong>
+        Logged as: <strong>{user?.email}</strong>
       </span>
     ),
     disabled: true
@@ -17,6 +32,11 @@ const UserPanel = () => {
       text: <span>Change avatar</span>,
       disabled: true,
     },
+    {
+      key: 'signout',
+      text: <span>Sing Out</span>,
+      onClick: triggerLogout
+    }
   ]
   return (
     <Grid style={{ background: '#4c3c4c', margin: 0 }}>
@@ -29,13 +49,16 @@ const UserPanel = () => {
           </Header>
         </Grid.Row>
         <Header style={{ padding: '0.25em' }} as="h4" inverted>
-          <Dropdown trigger={<span>User</span>} options={dropdownOptions()}>
-            
-          </Dropdown>
+          {IsLoggedIn && user ? (
+          <Dropdown trigger={<span>{user?.userName}</span>} options={dropdownOptions()}>
+          </Dropdown>) :(
+          <Message>
+            Don't you have an account? <Link to="/register">Register</Link>
+          </Message>)}
         </Header>
       </Grid.Column>
     </Grid>
   )
 }
 
-export default UserPanel
+export default observer(UserPanel)

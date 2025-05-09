@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aspnet/signalr": "^1.0.26",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -12,14 +13,22 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
     "@types/react-router-dom": "^5.3.3",
+    "@types/revalidate": "^1.1.6",
     "@types/uuid": "^10.0.0",
     "axios": "^1.8.4",
+    "final-form": "^4.20.10",
+    "history": "^5.3.0",
+    "md5": "^2.3.0",
     "mobx": "^6.0.1",
     "mobx-react-lite": "^3.4.0",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-final-form": "^6.5.9",
     "react-router-dom": "^7.5.0",
     "react-scripts": "^5.0.1",
+    "react-toastify": "^11.0.5",
+    "revalidate": "^1.2.0",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.5",
     "typescript": "^4.9.5",
@@ -49,5 +58,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/md5": "^2.3.5"
   }
 }

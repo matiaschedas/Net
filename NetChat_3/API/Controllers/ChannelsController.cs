@@ -14,37 +14,47 @@ using Persistence;
 using SQLitePCL;
 using Application.Channels;
 using System.Threading;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ChannelsController : ControllerBase
+    public class ChannelsController : BaseController
     {
-        private IMediator _mediator;
-
-        public ChannelsController(IMediator mediator)
-        {
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        }
-
+    
         [HttpGet]
-        public async Task<ActionResult<List<Channel>>> List(CancellationToken ct)
+        public async Task<ActionResult<List<Channel>>> List([FromQuery] List.Query query)
         {
-            return await _mediator.Send(new List.Query(), ct);
+            return await Mediator.Send(query);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Channel>> Details (Guid id)
+
+        /*[Authorize]
+        no es necesario si aplico una politica para requerir user authenticado en los controladores desde el startup.cs, ahora si quiero que 
+        un endpoint particular se pueda usar sin autorizacion puedo usar el verbo [AllowAnonymous]*/
+        public async Task<ActionResult<ChannelDto>> Details (Guid id)
         {
-            return await _mediator.Send(new Details.Query { Id = id });
+            return await Mediator.Send(new Details.Query { Id = id });
         } 
 
         [HttpPost]
         public async Task<Unit> Create(Create.Command command)
         {
-            return await _mediator.Send(command);
+            return await Mediator.Send(command);
+        }
+
+        [HttpGet("private/{id}")]
+        public async Task<ActionResult<ChannelDto>> PrivateDetails(string id) 
+        {
+            return await Mediator.Send(new PrivateChannelDatails.Query{ UserId = id });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<Unit> Edit(Guid id, [FromBody] Edit.Command command)
+        {
+            command.Id = id;
+            return await Mediator.Send(command);
         }
     }
 }

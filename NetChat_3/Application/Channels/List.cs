@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Error;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Persistence;
+using System.Net;
 using SQLitePCL;
 
 namespace Application.Channels
@@ -16,7 +18,7 @@ namespace Application.Channels
     {
         public class Query : IRequest<List<Channel>>
         {
-
+            public ChannelType ChannelType { get; set; } = ChannelType.Channel;
         }
 
         public class Handler : IRequestHandler<Query, List<Channel>>
@@ -45,7 +47,9 @@ namespace Application.Channels
                 {
                     _logger.LogInformation("La tarea fue cancelada");
                 }*/
-                return await _context.Channels.ToListAsync();
+                //throw new RestException(HttpStatusCode.NotFound, new { channel = "Not Found" });
+                //throw new Exception("Server ERROR");
+                return await _context.Channels.Where(x => x.ChannelType == request.ChannelType).ToListAsync();
             }
         }
   }

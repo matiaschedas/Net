@@ -1,26 +1,33 @@
-import React, { ChangeEvent, useContext, useState } from 'react'
+import React, { ChangeEvent, useContext, useState, useEffect } from 'react'
 import { Button, Form, Icon, Input, Modal, ModalActions } from 'semantic-ui-react'
-import { IChannel } from '../../Models/channels'
+import { ChannelType, IChannel } from '../../Models/channels'
 import { v4 as uuid } from 'uuid'
-import ChannelStore from '../../Stores/ChannelStore'
+import { RootStoreContext } from '../../Stores/rootStore'
 import { observer } from 'mobx-react-lite'
+import { useNavigate } from 'react-router-dom'
 
 
 const ChannelForm: React.FC = () => {
   const initialChannel = {
     id: '',
     name: '',
-    description: ''
+    description: '',
+    channelType: ChannelType.Channel
   }
   const [channel, setChannel] = useState<IChannel>(initialChannel)
-  const { isModalVisible, showModal, createChannel } = useContext(ChannelStore);
+  const channelStore = useContext(RootStoreContext).channelStore
+  const { isModalVisible, showModal, createChannel, setNavigate } = channelStore;
+  const navigate = useNavigate();
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value)
+    //console.log(event.target.value)
     setChannel({ ...channel, [event.target.name]: event.target.value })
   }
 
+  useEffect(() => {
+    setNavigate(navigate)
+  },[navigate, setNavigate])
+
   const handleSubmit = () => {
-    console.log("hola")
     let newChannel = {
       ...channel,
       id: uuid()
