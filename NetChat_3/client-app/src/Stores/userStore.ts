@@ -33,7 +33,7 @@ export default class UserStore {
       if (!connection) throw new Error("Hub connection is not established");
       await connection.invoke('Login', values);*/
       var user = await agent.User.login(values)
-      
+      console.log("EL USUARIO LOGEO: "+JSON.stringify(user, undefined , 2))
       debugger;
       runInAction(() => {
         this.user = user;

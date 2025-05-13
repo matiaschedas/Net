@@ -12,7 +12,7 @@ const Messages = () => {
   const rootStore= useContext(RootStoreContext)
   const channelStore = rootStore.channelStore
   const { setCurrentUser, user} = rootStore.userStore
-  const { getCurrentChannel, isChannelLoaded, activeChannel } = channelStore
+  const { getCurrentChannel, isChannelLoaded, activeChannel, setChannelStarred } = channelStore
   const { messages, loadMessages } = rootStore.messageStore
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 /*
@@ -46,17 +46,20 @@ const Messages = () => {
   const displayMessages = (messages: IMessage[]) => {
     //console.log(messages.map(m => ({ createdAt: m.createdAt, type: typeof m.createdAt, isDate: m.createdAt instanceof Date })));
     const sortedMessages = [...messages].sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-
-    return (sortedMessages.length > 0 && sortedMessages.map((message, index) => { 
-      const previousMessage = index > 0 ? sortedMessages[index - 1] : null
+    const filteredMessages = sortedMessages.filter(m => m.channelId === getCurrentChannel().id)
+    return (filteredMessages.length > 0 && filteredMessages.map((message, index) => { 
+      const previousMessage = index > 0 ? filteredMessages[index - 1] : null
       return(
               <Message message={message} key={message.id} currentUser={user} previousMessage={previousMessage} />
             )
     }))
   }
+  const handleStar = () => {
+    setChannelStarred(activeChannel!)
+  }
   return (
     <React.Fragment>
-      <MessagesHeader currentChannel={getCurrentChannel()} currentUser={user}/>
+      <MessagesHeader currentChannel={getCurrentChannel()} currentUser={user} handleStar={handleStar}/>
       {!user ? (
         <div>Cargando Usuario...</div>
       ): (

@@ -39,7 +39,8 @@ namespace Application.User
                 UserName = user.UserName,
                 Token = jwtGenerator.CreateToken(user),
                 Email = user.Email,
-                Id = user.Id
+                Id = user.Id,
+                Avatar = user.Avatar
             };
             
         }

@@ -2,6 +2,7 @@ import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { useContext, useEffect } from 'react'
 import { Icon, Loader, Menu } from 'semantic-ui-react'
+import { ChannelType } from '../../Models/channels';
 import { IUser } from '../../Models/users';
 import { RootStoreContext } from '../../Stores/rootStore';
 import DirectMessagesItem from './DirectMessageslItem'
@@ -11,15 +12,20 @@ const DirectMessages = () => {
   const channelStore = rootStore.channelStore
   const messageStore = rootStore.messageStore
   const userStore = rootStore.userStore
+  const commonStore = rootStore.commonStore
   const { changePrivateChannel, getCurrentChannel } = channelStore
   const { loadMessages } = messageStore
+  const { setSelectedChannelType, selectedChannelType, selectedChannelId, setSelectedChannelId} = commonStore
 
   const { loadUsers, users, user } = userStore
   const currentUser = user
 
   const changeChannel = async (user: IUser) =>{
     await changePrivateChannel(toJS(user).id)
-    loadMessages(getCurrentChannel()?.id)
+    let currentChannelId = getCurrentChannel()?.id
+    loadMessages(currentChannelId)
+    setSelectedChannelId(user.id)
+    setSelectedChannelType(ChannelType.Room)
   }
   const displayChannels = (users: IUser[]) => {
     if (!currentUser) return <Loader active inline="centered"/>
@@ -29,7 +35,7 @@ const DirectMessages = () => {
     return (
       usersFiltrado.length > 0 && 
       usersFiltrado.map((user) => (
-        <DirectMessagesItem key={user.id} user={user} changeChannel={changeChannel} />
+        <DirectMessagesItem key={user.id} user={user} changeChannel={changeChannel} active={selectedChannelId === user.id && selectedChannelType === ChannelType.Room}/>
       ))
     )
   }

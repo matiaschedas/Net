@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useState } from 'react'
 import { Icon, Menu } from 'semantic-ui-react'
 import { ChannelType, IChannel } from '../../Models/channels' 
 import ChannelItem from './ChannelItem'
@@ -9,10 +9,13 @@ import { useNavigate } from 'react-router-dom'
 import { error } from 'console'
 
 const Channels = () =>  {
-  
     const rootStore = useContext(RootStoreContext);
     const channelStore = rootStore.channelStore
     const messageStore = rootStore.messageStore
+    const commonStore = rootStore.commonStore
+    const userStore = rootStore.userStore
+    const { user } = userStore
+    const {setSelectedChannelId, selectedChannelId, setSelectedChannelType, selectedChannelType} = commonStore
     const navigate = useNavigate();
     useEffect(() => {
       channelStore.loadChannels(ChannelType.Channel)
@@ -23,21 +26,36 @@ const Channels = () =>  {
       channelStore.setNavigate(navigate)
     },[navigate, channelStore])
 
-    const { channels, setActiveChannel, getCurrentChannel} = channelStore
+    const { channels, setActiveChannel, getCurrentChannel, channelNotification, cleanNotification} = channelStore
     const { loadMessages } = messageStore 
     
     const changeChannel = (channel: IChannel) => {
       setActiveChannel(channel)
       //console.log(getCurrentChannel())
-      loadMessages(getCurrentChannel()?.id)
+      let currentChannelId = getCurrentChannel()?.id
+      loadMessages(currentChannelId)
+      setSelectedChannelId(currentChannelId)
+      setSelectedChannelType(ChannelType.Channel)
+      cleanNotification(currentChannelId)
     } 
     const displayChannels = (channels: IChannel[]) => {
       return (
         channels.length > 0 && 
         channels.map((channel) => (
-          <ChannelItem key={channel.id} channel={channel} changeChannel={changeChannel} />
+          <ChannelItem key={channel.id} channel={channel} getNotificationCount={getNotificationCount} changeChannel={changeChannel} active={selectedChannelId === channel.id && selectedChannelType === ChannelType.Channel}/>
         ))
       )
+    }
+
+    const getNotificationCount = (channel: IChannel) => {
+      let count = 0
+      console.log("notis: "+JSON.stringify(channelNotification, undefined ,2))
+      channelNotification.forEach((notification) => {
+        if(notification.id === channel.id && notification.sender.id !== user?.id){
+          count = notification.newMessages
+        }
+      })
+      if(count > 0) return count   
     }
 
     return (

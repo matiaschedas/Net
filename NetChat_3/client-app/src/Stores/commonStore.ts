@@ -1,6 +1,7 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@aspnet/signalr";
 import { error } from "console";
 import { makeObservable, observable, action, runInAction } from "mobx";
+import { ChannelType } from "../Models/channels";
 import { IMessage } from "../Models/messages";
 import { IUser } from "../Models/users";
 import { RootStore } from "./rootStore";
@@ -10,11 +11,21 @@ export default class CommonStore{
   @observable token: string | null = window.localStorage.getItem('jwt')
   @observable appLoaded = false
   @observable.ref hubConnection: HubConnection | null = null
+  @observable selectedChannelId: string | null = null
+  @observable selectedChannelType: ChannelType | null = null
   
   constructor(rootStore: RootStore) {
     makeObservable(this)
     this.rootStore = rootStore;
     
+  }
+  
+  @action setSelectedChannelId = (id: string) => {
+    this.selectedChannelId = id
+  }
+
+  @action setSelectedChannelType = (type: ChannelType) => {
+    this.selectedChannelType = type
   }
 
   @action setAppLoaded = () => {
@@ -49,6 +60,7 @@ export default class CommonStore{
       runInAction(() => {
        // this.messages.push(message)
         this.rootStore.messageStore.messages = [...this.rootStore.messageStore.messages, message]
+        this.rootStore.channelStore.addNotification(message.channelId, message)
       })
     })
     this.hubConnection.on('UserLogged', (user: IUser) => {

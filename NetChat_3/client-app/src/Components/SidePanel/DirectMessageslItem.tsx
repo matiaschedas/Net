@@ -5,16 +5,17 @@ import { IUser } from '../../Models/users'
 interface IProps {
   user: IUser,
   changeChannel: (user: IUser) => void
+  active: boolean
 }
 
-const DirectMessagesItem: React.FC<IProps>= ({ user, changeChannel }) => {
+const DirectMessagesItem: React.FC<IProps>= ({ user, changeChannel, active }) => {
 
   const isUserOnline = (user: IUser) => {
     return user.isOnline
   }
 
   return (
-        <Menu.Item key={user.email} onClick={() => changeChannel(user)} name={user.userName} style={{ opacity: 0.7, display: 'flex', alignItems: 'center' }}>
+        <Menu.Item active={active} key={user.email} onClick={() => changeChannel(user)} name={user.userName} style={{ opacity: 0.7, display: 'flex', alignItems: 'center' }}>
          <Popup
             content={isUserOnline(user) ? 'Disponible' : 'No disponible'}
             position="top center"

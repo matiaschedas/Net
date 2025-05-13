@@ -63,12 +63,15 @@ namespace Application.Messages
                 {
                     UserName = user.UserName,
                     Avatar = user.Avatar,
-                    Email = user.Email
+                    Email = user.Email,
+                    Id = user.Id
                 },
                 Content = message.Content,
                 CreatedAt = message.CreatedAt,
                 Id = message.Id,
-                MessageType = message.MessageType
+                MessageType = message.MessageType,
+                ChannelId = channel.Id
+                
             };
            }
            throw new Exception("There was a problem inserting the message");

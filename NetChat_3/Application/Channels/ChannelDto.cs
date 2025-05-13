@@ -15,5 +15,6 @@ namespace Application.Channels
         public ICollection<MessageDto> Messages { get; set; }
         public string PrivateChannelId {get; set;}
         public ChannelType ChannelType {get; set;}
+        public Guid ChannelId {get; set;}
     }
 }

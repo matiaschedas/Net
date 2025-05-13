@@ -70,7 +70,8 @@ namespace Application.User
                 return new UserDto{
                     UserName = user.UserName,
                     Email = user.Email,
-                    Token = jwtGenerator.CreateToken(user)
+                    Token = jwtGenerator.CreateToken(user),
+                    Avatar = user.Avatar
                 };
             }
         }

@@ -1,11 +1,12 @@
 import axios, { AxiosError, HttpStatusCode } from "axios"
 import { action, observable, makeObservable, runInAction, computed, toJS} from "mobx"
 import agent from "../Api/agent"
-import { ChannelType, IChannel } from "../Models/channels"
+import { ChannelType, IChannel, IChannelNotification } from "../Models/channels"
 import { toast } from 'react-toastify'
 import { RootStore } from "./rootStore"
 import { Channel, channel } from "diagnostics_channel"
 import { getEffectiveTypeParameterDeclarations } from "typescript"
+import { IMessage } from "../Models/messages"
 
 
 export default class ChannelStore {
@@ -18,6 +19,7 @@ export default class ChannelStore {
   @observable activeChannel: IChannel | null = null
   @observable isChannelLoaded: boolean = false
   @observable starredChannels: IChannel[] = []
+  @observable channelNotification: IChannelNotification[] = []
   
   constructor(rootStore: RootStore){
     makeObservable(this)
@@ -162,7 +164,25 @@ export default class ChannelStore {
     catch(error){
       throw error
     }
-  
+  }
+  @action addNotification = (channelId: string, message: IMessage) => {
+    let notification = this.channelNotification.filter((x) => x.id === channelId)
+    if(notification.length === 0){
+      this.channelNotification.push({
+        id: channelId,
+        newMessages: 1,
+        sender: message.sender
+      })
+      return 
+    }
+    console.log("notificacion: "+JSON.stringify(this.channelNotification, undefined, 2))
+    notification[0].newMessages = notification[0].newMessages + 1;
+  } 
+  @action cleanNotification = (channelId: string) => {
+    let notification = this.channelNotification.filter((x) => x.id === channelId)
+    if (notification.length !== 0) {
+      notification[0].newMessages = 0
+    }
   }
 }
 

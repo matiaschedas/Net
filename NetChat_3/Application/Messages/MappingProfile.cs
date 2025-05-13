@@ -12,6 +12,7 @@ namespace Application.Messages
         public MappingProfile()
         {
             CreateMap<Message, MessageDto>();
+            CreateMap<Channel, MessageDto>().ForMember(d => d.ChannelId, o => o.MapFrom(s => s.Id));
         }
     }
 }

@@ -12,6 +12,7 @@ export interface IMessage
     sender: IUser
     id: string
     messageType: MessageType
+    channelId: string
 }
 
 export interface IMessageFormValues 
