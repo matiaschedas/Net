@@ -111,21 +111,21 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3928ee5a-9b93-4537-9387-108c58fe60a5"),
+                            Id = new Guid("321ff86a-3769-4005-b489-849e65c72899"),
                             ChannelType = 0,
                             Description = "Canal dedicado a dotnet core",
                             Name = "DotnetCore"
                         },
                         new
                         {
-                            Id = new Guid("eda1da1e-a91d-4836-8f11-44eb5adc0bf3"),
+                            Id = new Guid("175d227f-8bdd-4c51-b7ec-f3bcab763b52"),
                             ChannelType = 0,
                             Description = "Canal dedicado a Angular",
                             Name = "Angular"
                         },
                         new
                         {
-                            Id = new Guid("f3d556aa-94ce-4d7f-b9a4-77e0fc88fb72"),
+                            Id = new Guid("f435f082-eeab-433a-9ee3-73752be3bb32"),
                             ChannelType = 0,
                             Description = "Canal dedicado a Reactjs",
                             Name = "Reactjs"
@@ -160,6 +160,21 @@ namespace Persistence.Migrations
                     b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.ToTable("TypingNotifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -301,6 +316,21 @@ namespace Persistence.Migrations
                     b.HasOne("Domain.AppUser", "Sender")
                         .WithMany("Messages")
                         .HasForeignKey("SenderId");
+                });
+
+            modelBuilder.Entity("Domain.TypingNotification", b =>
+                {
+                    b.HasOne("Domain.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.AppUser", "Sender")
+                        .WithOne("TypingNotification")
+                        .HasForeignKey("Domain.TypingNotification", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

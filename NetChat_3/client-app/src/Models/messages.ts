@@ -25,3 +25,8 @@ export interface IMediaFormValues{
     file: Blob
     channelId: string
 }
+
+export interface ITypingNotification{
+    sender: IUser
+    channelId: string
+}

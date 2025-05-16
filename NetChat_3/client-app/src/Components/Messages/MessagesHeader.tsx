@@ -6,12 +6,14 @@ import SearchInput from './SearchInput'
 
 
 interface IProps {
-  currentChannel: IChannel | null
-  currentUser: IUser | null 
-  handleStar: () => void
+  currentChannel: IChannel | null,
+  currentUser: IUser | null,
+  handleStar: () => void,
+  handleSearchChange: (event: any) => void,
+  numUniqueUsers: number
 }
 
-const MessagesHeader : React.FC<IProps> = ({ currentChannel, currentUser, handleStar }) => {
+const MessagesHeader : React.FC<IProps> = ({ currentChannel, currentUser, handleStar, handleSearchChange, numUniqueUsers }) => {
   const isPrivateChannel = () => {
     return currentChannel?.channelType === ChannelType.Room
   }
@@ -38,11 +40,11 @@ const MessagesHeader : React.FC<IProps> = ({ currentChannel, currentUser, handle
       <Header fluid="true" as="h2" floated="left" style={{ marginBottom: 0 }}>
         <span>
           {channelDisplayName()}
-          {(isPrivateChannel()===false || isChannelStarred===true)&& <Icon name={isChannelStarred ? 'star' : 'star outline'} color={isChannelStarred ? 'yellow': 'black'} onClick={handleStar} />}
+          {(isPrivateChannel()===false || isChannelStarred===true) && <Icon name={isChannelStarred ? 'star' : 'star outline'} color={isChannelStarred ? 'yellow': 'black'} onClick={handleStar} />}
         </span>
-        <Header.Subheader>2 Users</Header.Subheader>
+        {(isPrivateChannel()===false || isChannelStarred===true) && <Header.Subheader>{numUniqueUsers} Users</Header.Subheader>}
       </Header>
-      <SearchInput />
+      <SearchInput handleSearchChange={handleSearchChange} />
     </Segment>
   )
 }

@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Domain
 {
-    public class AppUser: IdentityUser
+    public class AppUser : IdentityUser
     {
-        public string Avatar {get; set; }
+        public string Avatar { get; set; }
         [JsonIgnore]
-        public  ICollection<Message> Messages { get; set; }
+        public ICollection<Message> Messages { get; set; }
         public bool IsOnline { get; set; }
+        //[JsonIgnore]
+        //public TypingNotification TypingNotification { get; set; }
     }
 
 }

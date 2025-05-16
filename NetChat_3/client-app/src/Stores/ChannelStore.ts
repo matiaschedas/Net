@@ -43,6 +43,9 @@ export default class ChannelStore {
   @action loadChannels = async (channelType: ChannelType) => {
     try{
       var response = await agent.Channels.list(channelType)
+      if(channelType === ChannelType.Channel){
+        await this.rootStore.messageStore.loadMessages(response[0].id)
+      }
       runInAction(() => {
         var channelsFromResponse = response.filter(c => c.channelType === channelType)
         this.isChannelLoaded = false
@@ -96,9 +99,9 @@ export default class ChannelStore {
     this.activeChannel = channel
   } 
   @action getCurrentChannel = () => {
-    const active = this.activeChannel ?? this.channels[0]
-    console.log("channel: " + JSON.stringify( active, undefined, 2))
-    return toJS(active)
+    if(this.activeChannel !== null ) return toJS(this.activeChannel)
+    this.activeChannel = this.channels[0]
+    return toJS(this.activeChannel)
   }
   @action createChannel = async (channel: IChannel) => {
     try{

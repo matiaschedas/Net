@@ -1,6 +1,6 @@
 import { observable, action, runInAction, makeObservable } from "mobx";
 import agent from "../Api/agent";
-import { IMediaFormValues, IMessage, IMessageFormValues } from "../Models/messages";
+import { IMediaFormValues, IMessage, IMessageFormValues, ITypingNotification } from "../Models/messages";
 import { RootStore } from "./rootStore";
 import { HubConnection } from '@aspnet/signalr'
 import { HubConnectionBuilder } from "@aspnet/signalr/dist/esm/HubConnectionBuilder";
@@ -13,7 +13,8 @@ export default class MessageStore
   @observable isModalVisible: boolean = false
   @observable isImageModelVisble: boolean = false
   @observable imageSelected: string | null = null
-  
+  @observable userPosts: { [name: string] : { avatar: string, count: number}} | null = null
+  @observable typingsNotifications: ITypingNotification[] = []
 
   constructor(rootStore: RootStore  ) {
     makeObservable(this)
@@ -21,8 +22,22 @@ export default class MessageStore
     
   }
 
+  @action startTyping = async (typing: ITypingNotification) => 
+  {
+    try{
+      await this.rootStore.commonStore.hubConnection?.invoke('StartTyping', typing)
+    }catch (error){
+      throw error
+    }
+  }
 
-
+  @action stopTyping = async (typing: ITypingNotification) => {
+    try{
+      await this.rootStore.commonStore.hubConnection?.invoke("StopTyping", typing)
+    }catch (error){
+      throw error
+    }
+  }
   
 
   @action sendMessage = async (message: IMessageFormValues) => 
@@ -50,6 +65,7 @@ export default class MessageStore
         runInAction(() => {
           this.messages = result.messages ?? []
           console.log("se cargaron los mensajes")
+          this.countUserPosts(result.messages)
         });
       }
     }
@@ -78,5 +94,19 @@ export default class MessageStore
   }
   @action setImageSelected = (imageUrl : string) => {
     this.imageSelected = imageUrl
+  }
+  @action countUserPosts = (messages: IMessage[] | undefined) => {
+    let userPosts = messages?.reduce((acc: any, message) => {
+      if(message.sender.userName in acc) {
+        acc[message.sender.userName].count += 1
+      } else{
+        acc[message.sender.userName] = {
+          avatar: message.sender.avatar,
+          count: 1
+        }
+      }
+      return acc
+    }, {});
+    this.userPosts = userPosts
   }
 }

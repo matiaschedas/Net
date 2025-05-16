@@ -8,7 +8,7 @@ interface IProps extends FieldRenderProps<string, HTMLElement>, FormFieldProps {
 
 }
 
-const TextInput: React.FC<IProps> = ({ placeholder, type, icon, input, meta: {touched, error}, IconLabel }) => {
+const TextInput: React.FC<IProps> = ({ placeholder, type, icon, input, meta: {touched, error}, IconLabel, onChange}) => {
   return (
     <Form.Input fluid iconPosition='left' type={type} placeholder={placeholder}>
       {IconLabel && (
@@ -17,7 +17,9 @@ const TextInput: React.FC<IProps> = ({ placeholder, type, icon, input, meta: {to
         </button>
       )}
       <i aria-hidden="true" className={icon}></i>
-      <input {...input} className={IconLabel ? 'input__icon':''}/>
+      <input {...input} className={IconLabel ? 'input__icon':''} onChange={(e) => {input.onChange(e)
+        if (onChange) onChange(e)
+      }}/>
       {touched && error && (
         <Label basic color='red'>
           {error}

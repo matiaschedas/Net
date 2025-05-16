@@ -2,7 +2,7 @@ import { HubConnection, HubConnectionBuilder, LogLevel } from "@aspnet/signalr";
 import { error } from "console";
 import { makeObservable, observable, action, runInAction } from "mobx";
 import { ChannelType } from "../Models/channels";
-import { IMessage } from "../Models/messages";
+import { IMessage, ITypingNotification } from "../Models/messages";
 import { IUser } from "../Models/users";
 import { RootStore } from "./rootStore";
 
@@ -85,6 +85,23 @@ export default class CommonStore{
         }
       })
     })
+
+    this.hubConnection.on('UserStartTyping', (typing: ITypingNotification) => {
+      runInAction(() => {
+        const index = this.rootStore.messageStore.typingsNotifications.findIndex(t => t.channelId === typing.channelId && t.sender.userName === typing.sender.userName)
+        if (index !== -1) return 
+        this.rootStore.messageStore.typingsNotifications.push(typing)
+      })
+    })
+
+     this.hubConnection.on('UserStopTyping', (typing: ITypingNotification) => {
+      runInAction(() => {
+        const index = this.rootStore.messageStore.typingsNotifications.findIndex(t => t.channelId === typing.channelId && t.sender.userName === typing.sender.userName)
+        if(index !== -1) this.rootStore.messageStore.typingsNotifications.splice(index, 1)
+        return 
+      })
+    })
+
 
     await this.hubConnection.start()
     console.log('SignalR connection established')
