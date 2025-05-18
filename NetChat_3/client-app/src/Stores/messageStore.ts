@@ -24,6 +24,10 @@ export default class MessageStore
     
   }
 
+  @action setNoMorePreviousMessages = (state: boolean) => {
+    this.noMorePreviousMessages = state
+  }
+
   @action startTyping = async (typing: ITypingNotification) => 
   {
     try{
@@ -61,7 +65,9 @@ export default class MessageStore
 
   @action appendPreviousMessages = async (channelId: string, message : IMessage | null) => {
     try{
+      debugger
       if(channelId !== undefined){
+        await new Promise((resolve) => setTimeout(resolve, 1000)); //simula cargando
         const results = await this.rootStore.channelStore.detail(channelId, message)
         runInAction(() => {
           const existingMessages = new Set(this.messages.map(m => m.id))

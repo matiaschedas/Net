@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import React, { useContext, useDeferredValue, useEffect, useRef, useState} from 'react'
+import React, { useContext, useDeferredValue, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import { Segment, Comment, CommentGroup, Image, Icon, Button} from 'semantic-ui-react'
 import { IMessage, ITypingNotification } from '../../Models/messages'
 import { RootStoreContext } from '../../Stores/rootStore'
@@ -9,6 +9,8 @@ import Message from './Message'
 import ImageModal from './ImageModal'
 import Typing from './Typing'
 import { max } from 'moment'
+import { get } from 'http'
+import MessageStore from '../../Stores/messageStore'
 
 interface ISearchFormState {
   searchTerm?: string
@@ -26,6 +28,7 @@ const Messages = () => {
   const { setCurrentUser, user} = rootStore.userStore
   const { getCurrentChannel, isChannelLoaded, activeChannel, setChannelStarred } = channelStore
   const { messages, loadMessages, typingsNotifications, appendPreviousMessages, noMorePreviousMessages} = rootStore.messageStore
+  const messageStore = rootStore.messageStore
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [messageState, setMessageState] = useState<IMessage[]>([])
   const [numUniqueUsers, setNumUniqueUsers] = useState(0)
@@ -33,7 +36,8 @@ const Messages = () => {
   const [seClickeoCargarMasAntiguos, setSeClickeoCargarMasAntiguos] = useState(false)
   const [tieneScroll, setTieneScroll] = useState(false);
   const [estaAbajoDelTodo, setEstaAbajoDelTodo] = useState(true);
-
+  const prevScrollHeightRef = useRef<number | null>(null);
+  const firstLoadRef = useRef(true)
 /*
 // innecesario usando SignalR:
   useEffect(() => {
@@ -98,7 +102,7 @@ const Messages = () => {
             behavior: 'smooth' // Desplazamiento suave
           })
           }
-        }, 600) // 200 ms de retraso, ajusta este valor si es necesario
+        }, 100) // 200 ms de retraso, ajusta este valor si es necesario
         return () => clearTimeout(timer)
       }
     }, [messages, loadMessages, getCurrentChannel, isChannelLoaded]);
@@ -162,13 +166,15 @@ const Messages = () => {
   }
 
   const hayTypings = (typings: ITypingNotification[]): boolean => {
-    return typings.some(t => t.channelId === getCurrentChannel().id);
+    const typingsFiltered = typings.filter(t => t.sender.userName !== user?.userName)
+    return typingsFiltered.some(t => t.channelId === getCurrentChannel().id);
   }
 
   const diplayTypingsAvatars = (typings: ITypingNotification[]) => {
     const maxVisible = 3
-    const visibles = typings.slice(0, maxVisible)
-    const excedentes = typings.length - maxVisible
+    const typingsDelCahnnel = typings.filter(t => t.channelId === getCurrentChannel().id).filter(t => t.sender.userName !== user?.userName)
+    const visibles = typingsDelCahnnel.slice(0, maxVisible)
+    const excedentes = typingsDelCahnnel.length - maxVisible
 
     return visibles.map(typing => (
       <>
@@ -198,13 +204,55 @@ const Messages = () => {
   }
 
   const handleLoadMoreMessages = () => {
+    if (!messagesContainerRef.current) return;
+    const container = messagesContainerRef.current;
+    prevScrollHeightRef.current = container.scrollHeight;
+
     setSeClickeoCargarMasAntiguos(true)
-    setCharginPreviousMessages(true)
-    const sortedMessages = [...messages].sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    const sortedMessages = [...messageStore.messages].sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
     appendPreviousMessages(getCurrentChannel().id, sortedMessages[0])
-    setCharginPreviousMessages(false)
   }
 
+  useLayoutEffect(() => {
+    if (seClickeoCargarMasAntiguos && prevScrollHeightRef.current !== null && messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const newScrollHeight = container.scrollHeight;
+      const scrollDifference = newScrollHeight - prevScrollHeightRef.current;
+      container.scrollTop = scrollDifference;
+
+      // Limpiamos los flags
+      prevScrollHeightRef.current = null;
+      setSeClickeoCargarMasAntiguos(false);
+    }
+    setCharginPreviousMessages(false)
+  }, [messages]);
+
+  useEffect(() => {
+    if(isChannelLoaded && getCurrentChannel()){
+      messageStore.setNoMorePreviousMessages(false)
+      setMessageState([])
+    }
+  }, [getCurrentChannel()?.id])
+
+  useEffect(() => {
+    const container = messagesContainerRef.current
+    if(!container) return
+
+    const handleScroll = () => {
+      if(container.scrollTop === 0 && !charginPreviousMessages){
+        if(firstLoadRef.current)
+        {
+          firstLoadRef.current = false
+          return 
+        }
+        setCharginPreviousMessages(true)
+        handleLoadMoreMessages()
+      }
+    }
+    container.addEventListener('scroll', handleScroll)
+    return () => container.removeEventListener('scroll', handleScroll)
+  },[charginPreviousMessages])
+  
   useEffect(() =>{
     console.log(searchState)
     if(searchState.searchLoading){

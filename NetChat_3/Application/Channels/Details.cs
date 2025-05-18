@@ -40,7 +40,7 @@ namespace Application.Channels
                                                     //.ThenInclude(x => x.Sender)
                                                     .FirstOrDefaultAsync(o => o.Id == request.Id);
                 if (channel == null) throw new RestException(HttpStatusCode.NotFound, new { channel = "Not Found" });
-                var cantMaxMessagesInRequest = 5;
+                var cantMaxMessagesInRequest = 10;
                 var channelToReturn = new ChannelDto();
                 if (request.LastMessage?.Content == null)
                 {
