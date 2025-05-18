@@ -33,7 +33,7 @@ const Channels = () =>  {
       setActiveChannel(channel)
       //console.log(getCurrentChannel())
       let currentChannelId = getCurrentChannel()?.id
-      loadMessages(currentChannelId)
+      loadMessages(currentChannelId, null)
       setSelectedChannelId(currentChannelId)
       setSelectedChannelType(ChannelType.Channel)
       cleanNotification(currentChannelId)
@@ -51,7 +51,7 @@ const Channels = () =>  {
       let count = 0
       console.log("notis: "+JSON.stringify(channelNotification, undefined ,2))
       channelNotification.forEach((notification) => {
-        if(notification.id === channel.id && notification.sender.id !== user?.id){
+        if(notification.id === channel.id && notification.sender.userName !== user?.userName){
           count = notification.newMessages
         }
       })

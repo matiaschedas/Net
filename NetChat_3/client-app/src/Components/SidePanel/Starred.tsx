@@ -17,7 +17,7 @@ const Starred = () => {
       setActiveChannel(channel)
       //console.log(getCurrentChannel())
       let currentChannelId = getCurrentChannel()?.id
-      loadMessages(currentChannelId)
+      loadMessages(currentChannelId, null)
       setSelectedChannelId(currentChannelId)
       setSelectedChannelType(ChannelType.Starred)
     } 

@@ -35,7 +35,7 @@ const request = {
 const Channels = {
   list: (channelType: ChannelType) : Promise<IChannel[]> => request.get(`/channels?ChannelType=${channelType}`),
   create: (channel: IChannel) => request.post('/channels', channel),
-  detail: (channelId: string): Promise<IChannel> => request.get(`/channels/${channelId}`),
+  detail: (channelId: string, message?: IMessage | null): Promise<IChannel> => request.put(`/channels/details/${channelId}`, message ?? {}),
   privateChannel: (channelId: string): Promise<IChannel> =>  request.get(`/channels/private/${channelId}`),
   update: (channel: IChannel) => request.put(`/channels/${channel.id}`, channel)
 }

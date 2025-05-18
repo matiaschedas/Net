@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import React, { useContext, useDeferredValue, useEffect, useRef, useState} from 'react'
-import { Segment, Comment, CommentGroup, Image, Icon} from 'semantic-ui-react'
+import { Segment, Comment, CommentGroup, Image, Icon, Button} from 'semantic-ui-react'
 import { IMessage, ITypingNotification } from '../../Models/messages'
 import { RootStoreContext } from '../../Stores/rootStore'
 import MessageForm from './MessageForm'
@@ -25,10 +25,15 @@ const Messages = () => {
   const channelStore = rootStore.channelStore
   const { setCurrentUser, user} = rootStore.userStore
   const { getCurrentChannel, isChannelLoaded, activeChannel, setChannelStarred } = channelStore
-  const { messages, loadMessages, typingsNotifications} = rootStore.messageStore
+  const { messages, loadMessages, typingsNotifications, appendPreviousMessages, noMorePreviousMessages} = rootStore.messageStore
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [messageState, setMessageState] = useState<IMessage[]>([])
   const [numUniqueUsers, setNumUniqueUsers] = useState(0)
+  const [charginPreviousMessages, setCharginPreviousMessages] = useState(false)
+  const [seClickeoCargarMasAntiguos, setSeClickeoCargarMasAntiguos] = useState(false)
+  const [tieneScroll, setTieneScroll] = useState(false);
+  const [estaAbajoDelTodo, setEstaAbajoDelTodo] = useState(true);
+
 /*
 // innecesario usando SignalR:
   useEffect(() => {
@@ -38,20 +43,65 @@ const Messages = () => {
       console.log("se cambian los mensajes")
     }
   },[loadMessages, getCurrentChannel, isChannelLoaded ,activeChannel])*/
+  useEffect(() => {
+    const checkScroll = () => {
+      if (messagesContainerRef.current) {
+        const el = messagesContainerRef.current;
+        setTieneScroll(el.scrollHeight > el.clientHeight);
+      }
+    };
+
+    checkScroll();
+
+    // También lo podés volver a chequear cuando la ventana cambie de tamaño
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [messages, messageState]);
 
   useEffect(() => {
-    console.log("se scrollea")
-    const timer = setTimeout(() => {
+    const checkScroll = () => {
       if (messagesContainerRef.current) {
-        const messagesContainer = messagesContainerRef.current
-        messagesContainer.scrollTo({
-        top: messagesContainer.scrollHeight,
-        behavior: 'smooth' // Desplazamiento suave
-      })
+        const el = messagesContainerRef.current;
+        setTieneScroll(el.scrollHeight > el.clientHeight);
+
+        const estaAbajo =
+          el.scrollTop + el.clientHeight >= el.scrollHeight - 10; // margen de 10px
+        setEstaAbajoDelTodo(estaAbajo);
       }
-    }, 600) // 200 ms de retraso, ajusta este valor si es necesario
-    return () => clearTimeout(timer)
-  }, [messages, loadMessages, getCurrentChannel, isChannelLoaded]);
+    };
+
+    checkScroll();
+
+    // Escuchar scroll del contenedor además de resize
+    const el = messagesContainerRef.current;
+    el?.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
+
+    return () => {
+      el?.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [messages, messageState]);
+
+
+  useEffect(() => {
+      if(seClickeoCargarMasAntiguos === false){
+        console.log("se scrollea")
+        const timer = setTimeout(() => {
+          if (messagesContainerRef.current) {
+            const messagesContainer = messagesContainerRef.current
+            messagesContainer.scrollTo({
+            top: messagesContainer.scrollHeight,
+            behavior: 'smooth' // Desplazamiento suave
+          })
+          }
+        }, 600) // 200 ms de retraso, ajusta este valor si es necesario
+        return () => clearTimeout(timer)
+      }
+    }, [messages, loadMessages, getCurrentChannel, isChannelLoaded]);
 
   useEffect(() => {
     setCurrentUser()
@@ -147,6 +197,14 @@ const Messages = () => {
     ))
   }
 
+  const handleLoadMoreMessages = () => {
+    setSeClickeoCargarMasAntiguos(true)
+    setCharginPreviousMessages(true)
+    const sortedMessages = [...messages].sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    appendPreviousMessages(getCurrentChannel().id, sortedMessages[0])
+    setCharginPreviousMessages(false)
+  }
+
   useEffect(() =>{
     console.log(searchState)
     if(searchState.searchLoading){
@@ -163,16 +221,47 @@ const Messages = () => {
       {!user ? (
         <div>Cargando Usuario...</div>
       ): (
-      <div ref={messagesContainerRef}  style={{   maxHeight: '70vh',
-                                                  overflowY: 'auto', 
-                                              }}>
-        <Segment>
-            <CommentGroup size='large' className="messages"  style={{ width: '100%'  }}>
-              {displayMessages(messageState.length > 0 ? messageState : messages)}
-              {hayTypings(typingsNotifications) && <div style={{ display: 'flex', alignItems: 'center' }}> <>{diplayTypingsAvatars(typingsNotifications)} <Typing/></></div>}
+      <div style={{ position: 'relative' }}>
+        <div ref={messagesContainerRef}  style={{   maxHeight: '70vh',
+                                                    overflowY: 'auto', 
+                                                }}>
+          <Segment>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+                {noMorePreviousMessages===false ? <Button size="small" onClick={handleLoadMoreMessages} loading={charginPreviousMessages}>
+                  Cargar mensajes anteriores
+                </Button>: <span>No hay mas mensajes anteriores</span>}
+              </div>
+              <CommentGroup size='large' className="messages"  style={{ width: '100%'  }}>
+                {/* Botón para cargar mensajes anteriores */}
+                {displayMessages(messageState.length > 0 ? messageState : messages)}
+                {hayTypings(typingsNotifications) && <div style={{ display: 'flex', alignItems: 'center' }}> <>{diplayTypingsAvatars(typingsNotifications)} <Typing/></></div>}
+              </CommentGroup>
               
-            </CommentGroup>
-        </Segment>
+          </Segment>
+
+          {tieneScroll && !estaAbajoDelTodo && <Icon
+                    name="arrow down"
+                    size="large"
+                    color="blue"
+                    circular
+                    link
+                    onClick={() => {
+                      messagesContainerRef.current?.scrollTo({
+                        top: messagesContainerRef.current.scrollHeight,
+                        behavior: 'smooth',
+                      });
+                    }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '20px',
+                      right: '20px',
+                      zIndex: 1000,
+                      cursor: 'pointer',
+                      backgroundColor: 'white',
+                      boxShadow: '0px 2px 10px rgba(0,0,0,0.2)'
+                    }}
+                  />}
+        </div>
       </div>
       )}
       <MessageForm />

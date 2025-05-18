@@ -5,6 +5,7 @@ import { RootStore } from "./rootStore";
 import { HubConnection } from '@aspnet/signalr'
 import { HubConnectionBuilder } from "@aspnet/signalr/dist/esm/HubConnectionBuilder";
 import { LogLevel } from "@aspnet/signalr/dist/esm/ILogger";
+import { SearchResults } from "semantic-ui-react";
 
 export default class MessageStore
 {
@@ -15,6 +16,7 @@ export default class MessageStore
   @observable imageSelected: string | null = null
   @observable userPosts: { [name: string] : { avatar: string, count: number}} | null = null
   @observable typingsNotifications: ITypingNotification[] = []
+  @observable noMorePreviousMessages: boolean = false
 
   constructor(rootStore: RootStore  ) {
     makeObservable(this)
@@ -56,11 +58,31 @@ export default class MessageStore
       throw error
     }
   }
-  @action loadMessages = async (channelId: string) => {
+
+  @action appendPreviousMessages = async (channelId: string, message : IMessage | null) => {
+    try{
+      if(channelId !== undefined){
+        const results = await this.rootStore.channelStore.detail(channelId, message)
+        runInAction(() => {
+          const existingMessages = new Set(this.messages.map(m => m.id))
+          const newMessages = ((results.messages ?? []) as IMessage[]).filter(m => !existingMessages.has(m.id));
+          this.messages = [...this.messages, ...(newMessages ?? [])] 
+          if(newMessages.length === 0){
+            this.noMorePreviousMessages = true
+          }
+          console.log("se sumaron mensajes mas antiguos")
+          this.countUserPosts(this.messages)
+        })
+      }
+    }catch(error){
+      throw error
+    }
+  }
+  @action loadMessages = async (channelId: string, message: IMessage | null) => {
     try{
       this.messages = []
       if(channelId !== undefined){
-        const result = await this.rootStore.channelStore.detail(channelId)
+        const result = await this.rootStore.channelStore.detail(channelId, message)
         
         runInAction(() => {
           this.messages = result.messages ?? []

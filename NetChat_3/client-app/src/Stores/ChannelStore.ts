@@ -44,7 +44,7 @@ export default class ChannelStore {
     try{
       var response = await agent.Channels.list(channelType)
       if(channelType === ChannelType.Channel){
-        await this.rootStore.messageStore.loadMessages(response[0].id)
+        await this.rootStore.messageStore.loadMessages(response[0].id, null)
       }
       runInAction(() => {
         var channelsFromResponse = response.filter(c => c.channelType === channelType)
@@ -97,6 +97,7 @@ export default class ChannelStore {
   }
   @action setActiveChannel = (channel: IChannel) => {
     this.activeChannel = channel
+    this.rootStore.messageStore.noMorePreviousMessages = false
   } 
   @action getCurrentChannel = () => {
     if(this.activeChannel !== null ) return toJS(this.activeChannel)
@@ -141,9 +142,9 @@ export default class ChannelStore {
       if(axiosError.response?.status!==401) throw err
     }
   }
-  @action detail = async (channelId: string) : Promise<IChannel> => {
+  @action detail = async (channelId: string, message: IMessage | null) : Promise<IChannel> => {
     try{
-      return await agent.Channels.detail(channelId)
+      return await agent.Channels.detail(channelId, message)
     }
     catch (error){
       throw error
@@ -162,6 +163,7 @@ export default class ChannelStore {
       let currentChannel = await agent.Channels.privateChannel(userId)
       runInAction(() => {
         this.setActiveChannel(currentChannel)
+        this.rootStore.messageStore.noMorePreviousMessages = false
       });
     }
     catch(error){

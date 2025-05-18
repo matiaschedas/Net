@@ -16,7 +16,7 @@ using Application.Channels;
 using System.Threading;
 using Microsoft.AspNetCore.Authorization;
 
-
+#nullable enable
 namespace API.Controllers
 {
     public class ChannelsController : BaseController
@@ -28,14 +28,14 @@ namespace API.Controllers
             return await Mediator.Send(query);
         }
 
-        [HttpGet("{id}")]
+        [HttpPut("details/{id}")]
 
         /*[Authorize]
         no es necesario si aplico una politica para requerir user authenticado en los controladores desde el startup.cs, ahora si quiero que 
         un endpoint particular se pueda usar sin autorizacion puedo usar el verbo [AllowAnonymous]*/
-        public async Task<ActionResult<ChannelDto>> Details (Guid id)
+        public async Task<ActionResult<ChannelDto>> Details (Guid id, [FromBody] Message? message = null)
         {
-            return await Mediator.Send(new Details.Query { Id = id });
+            return await Mediator.Send(new Details.Query { Id = id, LastMessage=message });
         } 
 
         [HttpPost]

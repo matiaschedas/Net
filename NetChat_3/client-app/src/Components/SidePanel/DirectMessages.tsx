@@ -23,7 +23,7 @@ const DirectMessages = () => {
   const changeChannel = async (user: IUser) =>{
     await changePrivateChannel(toJS(user).id)
     let currentChannelId = getCurrentChannel()?.id
-    loadMessages(currentChannelId)
+    loadMessages(currentChannelId, null)
     setSelectedChannelId(user.id)
     setSelectedChannelType(ChannelType.Room)
   }
